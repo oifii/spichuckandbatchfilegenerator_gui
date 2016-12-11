@@ -1,0 +1,1 @@
+DIR "D:\oifii-org\httpdocs\ns-org\nsd\ar\cp\audio_spi\spichuckandbatchfilegenerator_gui\preset*.bat" /S /B /O:N > "D:\oifii-org\httpdocs\ns-org\nsd\ar\cp\audio_spi\spichuckandbatchfilegenerator_gui\filenames.txt"

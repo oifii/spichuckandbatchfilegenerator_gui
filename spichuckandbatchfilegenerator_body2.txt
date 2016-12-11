@@ -1,0 +1,10 @@
+T - (now % T) => now;
+chout <= IO.newline();
+<<<"Period(s): ">>>;
+<<<1::T/44100>>>;
+
+// construct the patch
+SndBuf buf => Gain g => dac;
+// read in the file
+//me.sourceDir() + "/data/kick.wav" => buf.read;
+string filename;

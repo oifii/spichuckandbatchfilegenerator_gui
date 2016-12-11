@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> <html>
+<head>
+<style type="text/css">
+.mytable {
+border:1px solid #000000;
+border-collapse:collapse;
+width:200px;
+}
+.mytable td{
+background:#cccccc;
+border:1px solid #000000;
+}
+</style>
+
+<script type="text/javascript">
+var dir = "";
+var numTable = 7;
+var numRow = 9;
+var mySamples = new Array();
+var myPeriods = new Array();
+//var myNumCol=new Array(100,70,50,60,120,30,80);
+var myNumCol=new Array();
+var myTablesNumCol = new Array(); 
+var myTablesNumRow = new Array(); 
+var myTables = new Array(); 
+var myTableBodies = new Array(); 
+var WSH=new ActiveXObject('WScript.Shell');
+var WSHAPP = new ActiveXObject("Shell.Application");
+
+function readDirectory()
+{
+	var loc = window.location.pathname;
+	dir = loc.substring(0, loc.lastIndexOf('/'));
+	dir = dir.replace(/\//g, '\\');
+	dir = dir.substring(1,dir.length);	
+}
+
+function readSamples() 
+{
+	var fso, ts, data;
+	fso = new ActiveXObject("Scripting.FileSystemObject");
+	//ts = fso.OpenTextFile("D:\\oifii-org\\httpdocs\\ns-org\\nsd\\ar\\cp\\audio_wave\\recycle_test2\\samples.txt", 1);
+	var filename = dir + '\\' + "samples.txt";
+	ts = fso.OpenTextFile(filename, 1);
+	data = ts.ReadAll();
+	//alert(data);
+   	var data_lines=data.split("\r\n"); //split lines	
+	numTable = data_lines.length;
+	//alert(numTable);
+    for(var i=0;i<data_lines.length;i++)
+    {
+    	var line=data_lines[i];
+    	mySamples[i]=line;
+    	//alert(line);
+    }
+	
+    for(var ii=0;ii<(mySamples.length);ii++)
+    //for(var ii=0;ii<(mySamples.length);)
+    {
+    	//alert(ii);
+		////////////////////////
+		//generate filenames.txt
+		////////////////////////
+		var quote = '"';
+		var path = dir + "\\" + mySamples[ii] + "*.wav";
+		//var command = "DIR " + quote + path + quote + " /S /B /O:N > filenames.txt";		
+		//var command = "DIR " + quote + path + quote + " /S /B /O:N > filenames.txt";		
+		var command = "DIR " + quote + path + quote + " /S /B /O:N > " + quote + dir + "\\" + "filenames.txt" + quote;		
+		//var command = "DIR " + quote + path + quote;		
+		//var command = 'DIR ';
+		//alert(command);
+		var batchfilename = dir + "\\" + "batchfile.bat";
+		var s = fso.OpenTextFile(batchfilename, 2, true); //if we use 2 instead of 8, the file will be overwritten;
+		s.WriteLine(command);
+		s.Close();
+
+		//WSH.Run(command);
+		//WSH.Exec(command);
+		//WSH.Run("D:\\oifii-org\\httpdocs\\ns-org\\nsd\\ar\\cp\\audio_wave\\recycle_test2\\batchfile.bat");
+		WSH.Run("D:\\oifii-org\\httpdocs\\ns-org\\nsd\\ar\\cp\\audio_wave\\recycle_test2\\batchfile.bat", 0, true); //0 to hide windows, true to wait
+		//WSH.Run("batchfile.bat");
+		
+		//var commandtoRun = "DIR";
+		//var commandParms = quote + path + quote + " /S /B /O:N > " + quote + dir + "\\" + "filenames.txt" + quote;
+		//WSHAPP.ShellExecute(commandtoRun, commandParms, "", "open", "1");
+		
+		////////////////////
+		//read filenames.txt
+		////////////////////
+		var filename = dir + '\\' + "filenames.txt";
+		var ts2 = fso.OpenTextFile(filename, 1);
+		var data2 = ts2.ReadAll();
+		//alert(data);
+	   	var data_lines2=data2.split("\r\n"); //split lines	
+	   	//alert(data_lines2);
+		myNumCol[ii] = data_lines2.length;
+		if(myNumCol[ii]>1) myNumCol[ii]--; //this because there is one too many lines compare to number of wave file found
+	}
+}
+
+function readPeriods() 
+{
+	/*
+	jQuery.get("periods.txt", function(data)
+	{
+	    //alert(data); //displays all file data at once
+	    var data_lines=data.split("\r\n"); //split lines	
+		numRow = data_lines.length;
+	    for(var i=0;i<data_lines.length;i++)
+	    {
+	    	var line=data_lines[i];
+	    	myPeriods[i]=parseFloat(line);
+	    	//alert(line);
+	    }
+	});
+	*/
+	
+	var fso, ts, data;
+	fso = new ActiveXObject("Scripting.FileSystemObject");
+	//ts = fso.OpenTextFile("D:\\oifii-org\\httpdocs\\ns-org\\nsd\\ar\\cp\\audio_wave\\recycle_test2\\samples.txt", 1);
+	var filename = dir + '\\' + "periods.txt";
+	ts = fso.OpenTextFile(filename, 1);
+	data = ts.ReadAll();
+	//alert(data);
+   	var data_lines=data.split("\r\n"); //split lines	
+	numRow = data_lines.length;
+	//alert(numTable);
+    for(var i=0;i<data_lines.length;i++)
+    {
+    	var line=data_lines[i];
+    	myPeriods[i]=parseFloat(line);
+    	//alert(line);
+    }
+
+}
+
+function setState(el) 
+{
+	if(el.className == "dn")
+	{
+		el.className = "up";
+		el.style.backgroundColor = '#ffffff';
+	}
+	//else if(el.className == "up")
+	else
+	{
+		el.className = "dn";
+		el.style.backgroundColor = '#ff0000';
+	}
+	
+}
+
+function initTables()
+{
+	var root=document.getElementById('mydiv');
+	for(var k=0; k<numTable; k++)
+	{
+		myTablesNumCol[k]=myNumCol[k];
+		myTablesNumRow[k]=9;
+		myTables[k]=document.createElement('table');
+		myTables[k].className="mytable";
+		myTableBodies[k]=document.createElement('tbody');
+		
+		myTables[k].appendChild(myTableBodies[k]);
+		root.appendChild(myTables[k]);
+	}	
+//tab.appendChild(tbo);
+//root.appendChild(tab);
+	
+}
+
+function addRows()
+{
+	//if (!document.getElementsByTagName) return;
+	//tabBody=document.getElementsByTagName("TBODY").item(0);
+	for(var k=0; k<numTable; k++)
+	{	
+		//tablebody=myTableBodies[k].item(0);
+		tablebody=myTableBodies[k];
+		//for(var i=0; i<numRow; i++)
+		for(var i=0; i<myTablesNumRow[k]; i++)
+		{
+			row=document.createElement("TR");
+			//for(var j=0; j<numCol; j++)
+			for(var j=0; j<myTablesNumCol[k]; j++)
+			{
+				cell1 = document.createElement("TD");
+				//textnode1=document.createTextNode(j.toString());
+				//cell1.appendChild(textnode1);
+				var button = document.createElement('button');	
+				button.innerHTML = (j+1).toString();
+				button.onclick = function()
+				{
+    				//alert('here be dragons');return false;
+    				setState(this);
+  				};	
+  				cell1.appendChild(button);						
+				row.appendChild(cell1);
+			}
+			tablebody.appendChild(row);  
+		}
+	}
+}
+
+function initAll()
+{
+	readDirectory();
+	readSamples();
+	readPeriods();
+	initTables();
+	addRows();	
+}
+</script>
+</head>
+<body onload='initAll();return false;'>
+
+<div id="mydiv"></div>
+
+
+</body>
+</html>

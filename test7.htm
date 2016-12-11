@@ -1,0 +1,584 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> <html>
+<head>
+<style type="text/css">
+.h1 {
+color: #ffffff;
+}
+.mytable {
+border:0px solid #000000;
+border-collapse:collapse;
+width:50px;
+}
+
+.mytable td{
+background: rgba(2,100,100,0);
+border:0px solid #000000;
+}
+
+.mybutton {
+background: transparent;
+}
+
+.mytext {
+color: #ffffff;
+}
+</style>
+
+<!-- 
+	border:2px solid #999999;
+
+	border:1px
+	width:200px;
+	
+	border:1px
+	background:#cccccc; 
+-->
+
+<script type="text/javascript">
+var chuckexecutable='D:\\oifii-org\\httpdocs\\ns-org\\nsd\\ar\\cp\\audio_chuck-1.3.1\\chuck-1.3.1.3-exe\\bin\\chuck.exe';
+var cmdowexecutable='D:\\oifii-org\\httpdocs\\ns-org\\nsd\\ar\\cp\\cmdow\\cmdow.exe';
+var dir = "";
+var numChuckPlay = 0;
+var myChuckPlays = new Array();
+var myChuckPlaysELEMENT = new Array();
+var numSavedPresets = 0;
+var numTable = 7;
+var numRow = 9;
+var mySamples = new Array();
+var myPeriods = new Array();
+//var myNumCol=new Array(100,70,50,60,120,30,80);
+var myNumCol=new Array();
+var myTablesNumCol = new Array(); 
+var myTablesNumRow = new Array(); 
+var myTables = new Array(); 
+var myTableBodies = new Array(); 
+var WSH = new ActiveXObject('WScript.Shell');
+var fso = new ActiveXObject("Scripting.FileSystemObject");
+
+//path local working directory
+function readDirectory()
+{
+	var loc = window.location.pathname;
+	dir = loc.substring(0, loc.lastIndexOf('/'));
+	dir = dir.replace(/\//g, '\\');
+	dir = dir.substring(1,dir.length);	
+}
+
+function writeSamplesDotText()
+{
+	
+}
+
+
+function readSamples() 
+{
+	//var fso = new ActiveXObject("Scripting.FileSystemObject");
+	var ts, data;
+	//ts = fso.OpenTextFile("D:\\oifii-org\\httpdocs\\ns-org\\nsd\\ar\\cp\\audio_wave\\recycle_test2\\samples.txt", 1);
+	var filename = dir + '\\' + "samples.txt";
+	ts = fso.OpenTextFile(filename, 1);
+	data = ts.ReadAll();
+	//alert(data);
+   	var data_lines=data.split("\r\n"); //split lines	
+	numTable = data_lines.length;
+	//alert(numTable);
+    for(var i=0;i<data_lines.length;i++)
+    {
+    	var line=data_lines[i];
+    	mySamples[i]=line;
+    	//alert(line);
+    }
+	
+    for(var ii=0;ii<(mySamples.length);ii++)
+    //for(var ii=0;ii<(mySamples.length);)
+    {
+    	//alert(ii);
+		////////////////////////
+		//generate filenames.txt
+		////////////////////////
+		var quote = '"';
+		var path = dir + "\\" + mySamples[ii] + "*.wav";
+		//var command = "DIR " + quote + path + quote + " /S /B /O:N > filenames.txt";		
+		//var command = "DIR " + quote + path + quote + " /S /B /O:N > filenames.txt";		
+		var command = "DIR " + quote + path + quote + " /S /B /O:N > " + quote + dir + "\\" + "filenames.txt" + quote;		
+		//var command = "DIR " + quote + path + quote;		
+		//var command = 'DIR ';
+		//alert(command);
+		//WSH.Run(command);
+		var batchfilename = dir + "\\" + "batchfile.bat";
+		var s = fso.OpenTextFile(batchfilename, 2, true); //if we use 2 instead of 8, the file will be overwritten;
+		s.WriteLine(command);
+		s.Close();
+
+
+		WSH.Run(batchfilename, 0, true); //0 to hide windows, true to wait
+		//WSH.Run("D:\\oifii-org\\httpdocs\\ns-org\\nsd\\ar\\cp\\audio_wave\\recycle_test2\\batchfile.bat", 0, true); //0 to hide windows, true to wait
+		
+		//var commandtoRun = "DIR";
+		//var commandParms = quote + path + quote + " /S /B /O:N > " + quote + dir + "\\" + "filenames.txt" + quote;
+		//WSHAPP.ShellExecute(commandtoRun, commandParms, "", "open", "1");
+		
+		////////////////////
+		//read filenames.txt
+		////////////////////
+		var filename = dir + '\\' + "filenames.txt";
+		var ts2 = fso.OpenTextFile(filename, 1);
+		var data2 = ts2.ReadAll();
+		//alert(data);
+	   	var data_lines2=data2.split("\r\n"); //split lines	
+	   	//alert(data_lines2);
+		myNumCol[ii] = data_lines2.length;
+		if(myNumCol[ii]>1) myNumCol[ii]--; //this because there is one too many lines compare to number of wave file found
+	}
+}
+
+function readPeriods() 
+{
+	/*
+	jQuery.get("periods.txt", function(data)
+	{
+	    //alert(data); //displays all file data at once
+	    var data_lines=data.split("\r\n"); //split lines	
+		numRow = data_lines.length;
+	    for(var i=0;i<data_lines.length;i++)
+	    {
+	    	var line=data_lines[i];
+	    	myPeriods[i]=parseFloat(line);
+	    	//alert(line);
+	    }
+	});
+	*/
+	
+	//var fso = new ActiveXObject("Scripting.FileSystemObject");
+	var ts, data;
+	//ts = fso.OpenTextFile("D:\\oifii-org\\httpdocs\\ns-org\\nsd\\ar\\cp\\audio_wave\\recycle_test2\\periods.txt", 1);
+	var filename = dir + '\\' + "periods.txt";
+	ts = fso.OpenTextFile(filename, 1);
+	data = ts.ReadAll();
+	//alert(data);
+   	var data_lines=data.split("\r\n"); //split lines	
+	numRow = data_lines.length;
+	//alert(numTable);
+    for(var i=0;i<data_lines.length;i++)
+    {
+    	var line=data_lines[i];
+    	myPeriods[i]=parseFloat(line);
+    	//alert(line);
+    }
+
+}
+
+function readSavedPresets()
+{
+	////////////////////////
+	//generate filenames.txt
+	////////////////////////
+	var quote = '"';
+	var path = dir + "\\" + 'preset' + "*.bat";
+	//var command = "DIR " + quote + path + quote + " /S /B /O:N > filenames.txt";		
+	//var command = "DIR " + quote + path + quote + " /S /B /O:N > filenames.txt";		
+	var command = "DIR " + quote + path + quote + " /S /B /O:N > " + quote + dir + "\\" + "filenames.txt" + quote;		
+	//var command = "DIR " + quote + path + quote;		
+	//var command = 'DIR ';
+	//alert(command);
+	//WSH.Run(command);
+	var batchfilename = dir + "\\" + "batchfile.bat";
+	var s = fso.OpenTextFile(batchfilename, 2, true); //if we use 2 instead of 8, the file will be overwritten;
+	s.WriteLine(command);
+	s.Close();
+	WSH.Run(batchfilename, 0, true); //0 to hide windows, true to wait
+	
+	////////////////////
+	//read filenames.txt
+	////////////////////
+	var filename = dir + '\\' + "filenames.txt";
+	var ts2 = fso.OpenTextFile(filename, 1);
+	var data2 = ts2.ReadAll();
+	//alert(data);
+   	var data_lines2=data2.split("\r\n"); //split lines	
+   	//alert(data_lines2);
+	numSavedPresets = data_lines2.length;
+	if(numSavedPresets>1) numSavedPresets--; //this because there is one too many lines compare to number of wave file found
+	
+	///////////////////
+	//populate dropdown
+	///////////////////
+	var ddl = document.getElementById( 'myDropdown' );
+	//alert(numSavedPresets);
+	for(var i = 0; i < numSavedPresets+1; i++) 
+	{
+		var theOption = new Option;
+		if(i==0) theOption.text = 'none';
+		else theOption.text = 'preset'+i;
+		theOption.value = i;
+		ddl.options[i] = theOption;
+	}
+	
+}
+
+
+function openChuck()
+{
+	//WSH.Run('chuck --loop', 0, false); //0 to hide windows, true to wait
+	//WSH.Run('chuck --loop', 1, false); //0 to hide windows, true to wait
+}
+
+function closeChuck()
+{
+	//WSH.Run('chuck --kill', 0, false);
+	stopAll();
+}
+
+function getChuckFilename(el)
+{
+	var indices = el.id.split(',');
+	var i,j,k;
+	i = indices[0];
+	j = indices[1];
+	k = indices[2];
+	//alert(i+','+j+','+k);
+	var segment, segmentstr;
+	segment = parseInt(j)+1;
+	if (segment<10) segmentstr='00'+segment.toString();
+	else if (segment<100) segmentstr='0'+segment.toString();
+	else segmentstr = segment.toString();
+	var chuckfilename = dir+'\\'+mySamples[k]+' '+segmentstr+'('+myPeriods[i]+')'+'.ck';
+	//var chuckfilename = mySamples[k]+' '+segmentstr+'('+myPeriods[i]+')'+'.ck';
+	
+	return chuckfilename;
+}
+
+function getElementFromChuckFilename(chuckfilename)
+{
+	var i,j,k;
+   	var data_lines = chuckfilename.split('('); //split at (
+   	//alert(data_lines);
+   	var data_lines2 = data_lines[data_lines.length-1];
+   	//alert(data_lines2);
+   	var data_lines3 = data_lines2.split(')'); //split at )
+   	//alert(data_lines3[0]);
+   	var periodstr=data_lines3[0];
+	i=getIFromPeriodStr(periodstr);
+	var segmentstr=data_lines[data_lines.length-2];
+	segmentstr=segmentstr.substring(segmentstr.length-3, segmentstr.length);
+	//alert(segmentstr);
+	j=getJFromSegmentStr(segmentstr);
+	var namestr = chuckfilename.substring(chuckfilename.lastIndexOf('\\')+1, chuckfilename.lastIndexOf('(')-4); //-4 for 3 char and 1 space
+	//alert(namestr);
+	k=getKFromNameStr(namestr);
+	var id=i.toString()+','+j.toString()+','+k.toString();
+	var el = document.getElementById(id);
+	return el;	
+}
+
+function getIFromPeriodStr(periodstr)
+{
+	var i=-1;
+	for(var ii=0; ii<myPeriods.length; ii++)
+	{
+		if(periodstr==myPeriods[ii])
+		{
+			i=ii;
+			break;
+		}
+	}
+	if(i==-1) alert('i is not valid!');
+	return i;
+}
+
+function getJFromSegmentStr(segmentstr)
+{
+	var j=parseInt(segmentstr);
+	j=j-1;
+	if(j==-1) alert('j is not valid!');
+	return j;
+}
+
+function getKFromNameStr(namestr)
+{
+	var k=-1;
+	for(var ii=0; ii<mySamples.length; ii++)
+	{
+		if(namestr==mySamples[ii])
+		{
+			k=ii;
+			break;
+		}
+	}
+	if(k==-1) alert('k is not valid!');
+	return k;
+}
+
+function play(el)
+{
+	/*
+	var indices = el.id.split(',');
+	var i,j,k;
+	i = indices[0];
+	j = indices[1];
+	k = indices[2];
+	//alert(i+','+j+','+k);
+	var segment, segmentstr;
+	segment = parseInt(j)+1;
+	if (segment<10) segmentstr='00'+segment.toString();
+	else if (segment<100) segmentstr='0'+segment.toString();
+	else segmentstr = segment.toString();
+	var chuckfilename = dir+'\\'+mySamples[k]+' '+segmentstr+'('+myPeriods[i]+')'+'.ck';
+	*/
+	var chuckfilename = getChuckFilename(el);
+	//alert(chuckfilename);
+	
+	
+	var quote = '"';
+	//WSH.Run(quote+chuckfilename+quote, 0, false); //0 to hide windows, true to wait
+	//WSH.Run(quote+chuckfilename+quote, 1, false); //0 to hide windows, true to wait
+	
+	
+	var chuckbatchfilename = dir + '\\' + 'chuckbatchfile.bat';
+	var command = 'start ' + quote + chuckfilename + quote + ' ' + quote + chuckexecutable + quote + ' ' + quote + chuckfilename + quote + '&';
+	//alert(command);
+	var s = fso.OpenTextFile(chuckbatchfilename, 2, true); //if we use 2 instead of 8, the file will be overwritten;
+	s.WriteLine(command);
+	s.Close();
+	WSH.Run(chuckbatchfilename, 0, true); //0 to hide windows, true to wait
+	
+	
+	numChuckPlay=numChuckPlay+1;
+	myChuckPlays[numChuckPlay-1]=chuckfilename;	
+	myChuckPlaysELEMENT[numChuckPlay-1]=el;
+}
+
+function stop(el)
+{
+	var chuckfilename = getChuckFilename(el);
+	var quote = '"';
+	//var command = 'taskkill /f /fi '+quote+'Windowtitle eq '+quote+chuckfilename+quote+quote+' /im * ';
+	var command = quote+cmdowexecutable+quote+' '+quote+chuckfilename+quote+' /end';
+	var chuckbatchfilename = dir + '\\' + 'chuckbatchfile.bat';
+	var s = fso.OpenTextFile(chuckbatchfilename, 2, true); //if we use 2 instead of 8, the file will be overwritten;
+	s.WriteLine(command);
+	s.Close();
+	WSH.Run(chuckbatchfilename, 0, true); //0 to hide windows, true to wait
+
+	var myChuckPlaysID = findChuckPlayID(chuckfilename);
+	myChuckPlays[myChuckPlaysID]="";	
+}
+
+function findChuckPlayID(chuckfilename)
+{
+	var found=0;
+    for(var i=0;i<(myChuckPlays.length);i++)
+    {
+    	if(myChuckPlays[i]==chuckfilename)
+    	{
+    		found = 1;
+    		break;	
+    	}
+	}
+	if(found==1) return i;
+	else alert('chuckfilename not found!');	
+}
+
+function saveChuckFilesToBatch()
+{
+	var quote = '"';
+	numSavedPresets = numSavedPresets + 1;
+	var preset, presetstr;
+	preset = numSavedPresets;
+	if (preset<10) presetstr='00'+preset.toString();
+	else if (preset<100) presetstr='0'+preset.toString();
+	else presetstr = preset.toString();
+	
+	var presetbatchfilename = dir + '\\' + 'preset'+presetstr+'.bat';
+	var s = fso.OpenTextFile(presetbatchfilename, 2, true); //if we use 2 instead of 8, the file will be overwritten;
+	
+   	for(var i=0;i<(myChuckPlays.length);i++)
+    {
+    	if(myChuckPlays[i]=="")
+    	{
+    		continue;	
+    	}
+	   	var command = 'start ' + quote + myChuckPlays[i] + quote + ' ' + quote + chuckexecutable + quote + ' ' + quote + myChuckPlays[i] + quote; 	
+		s.WriteLine(command);
+	}			
+	s.Close();   
+	
+	///////////////////////////////////
+	//populate dropdown, last item only
+	///////////////////////////////////
+	var ddl = document.getElementById( 'myDropdown' );
+	//alert(numSavedPresets);
+	var i = numSavedPresets; 
+	var theOption = new Option;
+	theOption.text = 'preset'+i;
+	theOption.value = i;
+	ddl.options[i] = theOption;	 	
+}
+
+function stopAll()
+{
+   	for(var i=0;i<(myChuckPlays.length);i++)
+    {
+    	if(myChuckPlays[i]=="")
+    	{
+    		continue;	
+    	}
+		var el = myChuckPlaysELEMENT[i];
+		setState(el);		
+	}			
+
+}
+
+function setState(el) 
+{
+	if(el.className == "dn")
+	{
+		el.className = "up";
+		//el.style.backgroundColor = '#ffffff';
+		el.style.backgroundColor = 'transparent';
+		
+		stop(el);
+	}
+	//else if(el.className == "up")
+	else
+	{
+		el.className = "dn";
+		el.style.backgroundColor = '#ff0000'; //'#ff0000';
+		//alert(el.parent.parent.cellIndex);
+		//alert("test");
+		//////////////////
+		//play
+		//////////////////
+		play(el);
+		//alert(el.id);
+	}
+	
+}
+
+function loadPreset(el)
+{
+	var quote = '"';
+	
+	//0) Stop all sound
+	stopAll();
+	
+	//1) load preset batch file
+	//alert('selection changed, new index='+el.selectedIndex);
+	var preset, presetstr;
+	preset = el.selectedIndex;
+	if(preset==0) return;
+	if (preset<10) presetstr='00'+preset.toString();
+	else if (preset<100) presetstr='0'+preset.toString();
+	else presetstr = preset.toString();
+	
+	var presetbatchfilename = dir + '\\' + 'preset'+presetstr+'.bat';
+	var s = fso.OpenTextFile(presetbatchfilename, 1); 
+	var data = s.ReadAll();
+	s.Close();
+	//alert(data);
+   	var data_lines=data.split("\r\n"); //split lines	
+   	for(var ii=0; ii<data_lines.length; ii++)
+   	{
+		//2) get each chuck filename
+   		if(data_lines[ii]=="") break;
+	   	//alert(data_lines[ii]);
+	   	var data_lines2=data_lines[ii].split(quote); //split lines	
+	   	//alert(data_lines2[1]);
+	   	var chuckfilename = data_lines2[1];
+		//3) for each chuck filename, find element
+		var el=getElementFromChuckFilename(chuckfilename);
+		//4) enable button and play chuck file
+		setState(el);		
+
+   	}
+}
+
+function initTables()
+{
+	var root=document.getElementById('mydiv');
+	for(var k=0; k<numTable; k++)
+	{
+		//
+		//textnode1=document.createTextNode('test text');
+		textnode1=document.createTextNode(mySamples[k]);
+		//textnode1.style.color="#ffffff";
+		//textnode1.className="mytext";
+		//textnode1.setAttribute("color", '#ffffff');
+		root.appendChild(textnode1);
+		
+		myTablesNumCol[k]=myNumCol[k];
+		//myTablesNumRow[k]=9;
+		myTablesNumRow[k]=numRow;
+		myTables[k]=document.createElement('table');
+		myTables[k].className="mytable";
+		myTableBodies[k]=document.createElement('tbody');
+		
+		myTables[k].appendChild(myTableBodies[k]);
+		root.appendChild(myTables[k]);
+	}	
+//tab.appendChild(tbo);
+//root.appendChild(tab);
+	
+}
+
+function addRows()
+{
+	//if (!document.getElementsByTagName) return;
+	//tabBody=document.getElementsByTagName("TBODY").item(0);
+	for(var k=0; k<numTable; k++)
+	{	
+		//tablebody=myTableBodies[k].item(0);
+		tablebody=myTableBodies[k];
+		//for(var i=0; i<numRow; i++)
+		for(var i=0; i<myTablesNumRow[k]; i++)
+		{
+			row=document.createElement("TR");
+			//for(var j=0; j<numCol; j++)
+			for(var j=0; j<myTablesNumCol[k]; j++)
+			{
+				cell1 = document.createElement("TD");
+				//textnode1=document.createTextNode(j.toString());
+				//cell1.appendChild(textnode1);
+				var button = document.createElement('button');	//tbutton for transparent
+				button.className="mybutton";
+				button.innerHTML = (j+1).toString();
+				button.onclick = function()
+				{
+    				//alert('here be dragons');return false;
+    				setState(this);
+  				};	
+  				//button.id='555';
+  				button.id=i+','+j+','+k;
+  				cell1.appendChild(button);						
+				row.appendChild(cell1);
+			}
+			tablebody.appendChild(row);  
+		}
+	}
+}
+
+function initAll()
+{
+	readDirectory();
+	readSamples();
+	readPeriods();
+	readSavedPresets();
+	initTables();
+	addRows();	
+	openChuck();
+}
+function closeAll()
+{
+	closeChuck();
+}
+</script>
+</head>
+<body onload='initAll();return false;' bgcolor="#000000" background="C:\oifii-org\httpdocs\ns-org\nsd\ar\cp\audio_spi\images-instruments\Brain-Cells(1200x901).JPG" onunload='closeAll();return false;'>
+<select id="myDropdown" onChange="loadPreset(this)"></select>
+<button value = "1" onclick="saveChuckFilesToBatch()"> Save </button>
+<button value = "2" onclick="closeChuck()"> Stop </button>
+
+<div id="mydiv"></div>
+
+</body>
+</html>

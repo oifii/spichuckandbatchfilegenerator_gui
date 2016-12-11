@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> <html>
+<head>
+<script type="text/javascript">
+var numCol = 100;
+var numRow = 9;
+function addRow(content,morecontent)
+{
+	//if (!document.getElementsByTagName) return;
+	tabBody=document.getElementsByTagName("TBODY").item(0);
+	for(var i=0; i<numRow; i++)
+	{
+		row=document.createElement("TR");
+		for(var j=0; j<numCol; j++)
+		{
+			cell1 = document.createElement("TD");
+			//textnode1=document.createTextNode(content);
+			textnode1=document.createTextNode(j.toString());
+			cell1.appendChild(textnode1);
+			row.appendChild(cell1);
+		}
+		tabBody.appendChild(row);  
+	}
+}
+</script>
+</head>
+<body onload='addRow("123","456");return false;'>
+<table border='1' id='mytable'>
+<tbody>
+<!--
+<tr><td>22</td><td>333</td></tr>
+<tr><td>22</td><td>333</td></tr>
+-->
+</tbody>
+</table>
+
+<button onClick='addRow("123","456");return false;'>
+Add Row</button>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+filename => buf.read;
+chout <= IO.newline();
+<<<filename>>>;
+// set the gain
+1.0 => g.gain;
+
+// time loop
+while ((1::D)>(1::T))
+//while( true )
+{
+    // set the play position to beginning
+    0 => buf.pos;
+    // randomize gain a bit
+    Math.random2f(.8,.9) => buf.gain;
+
+	D - (1::T) => D;
+    // advance time
+    1::T => now;
+}

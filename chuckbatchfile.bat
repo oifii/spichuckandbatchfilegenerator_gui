@@ -1,0 +1,1 @@
+"D:\oifii-org\httpdocs\ns-org\nsd\ar\cp\audio_spi\spichuckandbatchfilegenerator_gui\cmdow.exe" "D:\oifii-org\httpdocs\ns-org\nsd\ar\cp\audio_spi\spichuckandbatchfilegenerator_gui\Ali Farka Toure - Karaw(intro-guitar-09sec-11sec)_2sec(loopable) 004(1.5).ck" /end

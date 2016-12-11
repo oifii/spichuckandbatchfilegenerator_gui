@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> <html>
+<head>
+<style type="text/css">
+.mytable {
+border:1px solid #000000;
+border-collapse:collapse;
+width:200px;
+}
+.mytable td{
+background:#cccccc;
+border:1px solid #000000;
+}
+</style>
+<script type="text/javascript">
+var numTable = 7;
+var numCol = 100;
+var numRow = 9;
+var myNumCol=new Array(100,70,50,60,120,30,80);
+var myTablesNumCol = new Array(); 
+var myTablesNumRow = new Array(); 
+var myTables = new Array(); 
+var myTableBodies = new Array(); 
+
+function initTables()
+{
+	var root=document.getElementById('mydiv');
+	for(var k=0; k<numTable; k++)
+	{
+		myTablesNumCol[k]=myNumCol[k];
+		myTablesNumRow[k]=9;
+		myTables[k]=document.createElement('table');
+		myTables[k].className="mytable";
+		myTableBodies[k]=document.createElement('tbody');
+		
+		myTables[k].appendChild(myTableBodies[k]);
+		root.appendChild(myTables[k]);
+	}	
+//tab.appendChild(tbo);
+//root.appendChild(tab);
+	
+}
+
+function addRow(content,morecontent)
+{
+	//if (!document.getElementsByTagName) return;
+	//tabBody=document.getElementsByTagName("TBODY").item(0);
+	for(var k=0; k<numTable; k++)
+	{	
+		//tablebody=myTableBodies[k].item(0);
+		tablebody=myTableBodies[k];
+		//tablebody=document.myTableBodies[k];
+		//for(var i=0; i<numRow; i++)
+		for(var i=0; i<myTablesNumRow[k]; i++)
+		{
+			row=document.createElement("TR");
+			//for(var j=0; j<numCol; j++)
+			for(var j=0; j<myTablesNumCol[k]; j++)
+			{
+				cell1 = document.createElement("TD");
+				//textnode1=document.createTextNode(content);
+				textnode1=document.createTextNode(j.toString());
+				cell1.appendChild(textnode1);
+				row.appendChild(cell1);
+			}
+			tablebody.appendChild(row);  
+		}
+	}
+}
+</script>
+</head>
+<body onload='initTables();addRow("123","456");return false;'>
+<table border='1' id='mytable'>
+<tbody>
+
+<tr><td>22</td><td>333</td></tr>
+<tr><td>22</td><td>333</td></tr>
+
+</tbody>
+</table>
+
+<div id="mydiv"></div>
+
+<button onClick='addRow("123","456");return false;'>
+Add Row</button>
+
+</body>
+</html>
